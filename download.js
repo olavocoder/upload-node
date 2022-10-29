@@ -1,21 +1,43 @@
 const express = require('express')
 const app = express()
-const fs = require('fs')
-const https = require('https')
+const dowloadImage = require('./middlewares/downloads')
+const bodyParser = require('body-parser')
+const planilhaJson = require('./middlewares/json-planilha')
 
-const url = 'https://media.revide.com.br/cache/60/41/6041ab236ad1b12fd8f9de9c41009c26.jpg';
+// configuração necessaria para receber a api do front end
+app.use(bodyParser.urlencoded({extended: false}))
+app.use(bodyParser.json())
 
-https.get(url,(res) => {
-    // Image will be stored at this path
-    const path = `${__dirname}/img.jpeg`; 
-    const filePath = fs.createWriteStream(path);
-    res.pipe(filePath);
-    filePath.on('finish',() => {
-        filePath.close();
-        console.log('Download Completed'); 
-    })
+// rota do front end
+app.get('/', (req, res)=>{
+    res.sendFile(__dirname+'/index.html')
 })
 
+// rota do back end
+app.post('/download', (req, res)=>{
+    const diretorio = `${__dirname}/public/download`
+    const dirCells = `${__dirname}/public/planilhas`
+    const api = req.body
+
+    planilhaJson(api, dirCells, 'github')
+
+    const url = api.map(function(item){
+        return{
+            link: item.avatar_url,
+            name: `${item.login}.png`
+        }
+    })
+
+    dowloadImage(url, diretorio)
+    console.log('A Api possui: ' + url.length + ' imagens')
+})
+
+// script de requisicao do front end
+app.get('/script.js', (req, res)=>{
+    res.sendFile(__dirname+'/script.js')
+})
+
+// servidor
 app.listen(3000, () => {
     console.log('Servidor iniciado na porta http://localhost/3000')
 })
