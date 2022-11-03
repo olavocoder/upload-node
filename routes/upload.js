@@ -1,6 +1,6 @@
 const express = require('express')
 const app = express()
-const uploadUser = require('./middlewares/uploads')
+const uploadUser = require('../middlewares/uploads')
 
 app.post('/upload-image', uploadUser.single('image'), async(req, res)=>{
     if(req.file){

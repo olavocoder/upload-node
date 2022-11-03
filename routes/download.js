@@ -1,8 +1,9 @@
 const express = require('express')
 const app = express()
-const dowloadImage = require('./middlewares/downloads')
+const dowloadImage = require('../middlewares/downloads')
 const bodyParser = require('body-parser')
-const planilhaJson = require('./middlewares/json-planilha')
+const planilhaJson = require('../middlewares/json-planilha')
+const dir = '/home/raccoon/projeto-raccoon/downloadImage/'
 
 // configuração necessaria para receber a api do front end
 app.use(bodyParser.urlencoded({extended: false}))
@@ -10,13 +11,13 @@ app.use(bodyParser.json())
 
 // rota do front end
 app.get('/', (req, res)=>{
-    res.sendFile(__dirname+'/index.html')
+    res.sendFile(dir + 'src/download/index.html')
 })
 
 // rota do back end
 app.post('/download', (req, res)=>{
-    const diretorio = `${__dirname}/public/download`
-    const dirCells = `${__dirname}/public/planilhas`
+    const diretorio = dir + `public/download`
+    const dirCells = dir + `public/planilhas`
     const api = req.body
 
     planilhaJson(api, dirCells, 'github')
@@ -34,7 +35,7 @@ app.post('/download', (req, res)=>{
 
 // script de requisicao do front end
 app.get('/script.js', (req, res)=>{
-    res.sendFile(__dirname+'/script.js')
+    res.sendFile(dir + 'src/download/script.js')
 })
 
 // servidor
